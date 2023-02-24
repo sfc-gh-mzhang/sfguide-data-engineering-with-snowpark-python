@@ -5,9 +5,9 @@ Author:       Jeremiah Hansen
 Last Updated: 1/9/2023
 -----------------------------------------------------------------------------*/
 
-USE ROLE HOL_ROLE;
-USE WAREHOUSE HOL_WH;
-USE DATABASE HOL_DB;
+USE ROLE MZ_HOL_ROLE;
+USE WAREHOUSE MZ_HOL_WH;
+USE DATABASE MZ_HOL_DB;
 
 
 -- ----------------------------------------------------------------------------
@@ -16,7 +16,7 @@ USE DATABASE HOL_DB;
 
 USE SCHEMA RAW_POS;
 
-ALTER WAREHOUSE HOL_WH SET WAREHOUSE_SIZE = XLARGE WAIT_FOR_COMPLETION = TRUE;
+ALTER WAREHOUSE MZ_HOL_WH SET WAREHOUSE_SIZE = XLARGE WAIT_FOR_COMPLETION = TRUE;
 
 COPY INTO ORDER_HEADER
 FROM @external.frostbyte_raw_stage/pos/order_header/year=2022
@@ -31,7 +31,7 @@ MATCH_BY_COLUMN_NAME = CASE_SENSITIVE;
 -- See how many new records are in the stream (this may be a bit slow)
 --SELECT COUNT(*) FROM HARMONIZED.POS_FLATTENED_V_STREAM;
 
-ALTER WAREHOUSE HOL_WH SET WAREHOUSE_SIZE = XSMALL;
+ALTER WAREHOUSE MZ_HOL_WH SET WAREHOUSE_SIZE = XSMALL;
 
 
 -- ----------------------------------------------------------------------------
@@ -73,4 +73,11 @@ FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY(
 ORDER BY START_TIME DESC
 LIMIT 100;
 
----*/
+SELECT *
+FROM TABLE(INFORMATION_SCHEMA.TASK_HISTORY(
+    SCHEDULED_TIME_RANGE_START=>DATEADD('DAY',-1,CURRENT_TIMESTAMP()),
+    result_limit => 10,
+    task_name=>'ORDERS_UPDATE_TASK'))
+ORDER BY SCHEDULED_TIME DESC
+;
+**/

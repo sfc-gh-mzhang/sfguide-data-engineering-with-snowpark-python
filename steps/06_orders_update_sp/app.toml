@@ -10,8 +10,8 @@ handler = "app.main"
 execute_as_caller = true
 
 [dev]
-database = "HOL_DB"
+database = "MZ_HOL_DB"
 schema = "HARMONIZED"
-warehouse = "HOL_WH"
-role = "HOL_ROLE"
+warehouse = "MZ_HOL_WH"
+role = "MZ_HOL_ROLE"
 overwrite = true
